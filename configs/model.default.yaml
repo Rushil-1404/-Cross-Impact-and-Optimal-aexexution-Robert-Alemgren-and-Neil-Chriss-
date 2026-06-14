@@ -1,0 +1,15 @@
+model:
+  name: cross_impact_ac
+  risk_aversion_default: 1.0
+  risk_aversion_scenarios: [0.1, 0.5, 1.0, 2.0, 5.0]
+  allow_permanent_impact: false
+  regularization:
+    covariance_diagonal_epsilon: 1.0e-8
+    impact_diagonal_epsilon: 1.0e-8
+constraints:
+  enforce_full_liquidation: true
+  max_participation_default: 0.1
+  allow_residual_inventory: false
+runtime:
+  max_assets: 50
+  max_horizon_buckets: 20

@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Cross-Impact Execution Optimizer API
+  version: 0.1.0
+paths:
+  /optimize:
+    post:
+      summary: Generate multi-asset execution schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizationRequest'
+      responses:
+        '200':
+          description: Optimization result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationResult'
+        '400':
+          description: Invalid input
+components:
+  schemas:
+    AssetOrder:
+      type: object
+      required: [asset_id, quantity]
+      properties:
+        asset_id: { type: string }
+        quantity: { type: number, description: Signed quantity; +buy, -sell }
+    BasketOrder:
+      type: object
+      required: [horizon_buckets, bucket_seconds, orders]
+      properties:
+        horizon_buckets: { type: integer, minimum: 1 }
+        bucket_seconds: { type: integer, minimum: 1 }
+        orders:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AssetOrder'
+    MarketSnapshot:
+      type: object
+      required: [asset_ids, covariance, temporary_impact, max_participation]
+      properties:
+        asset_ids:
+          type: array
+          items: { type: string }
+        covariance:
+          type: array
+          items:
+            type: array
+            items: { type: number }
+        temporary_impact:
+          type: array
+          items:
+            type: array
+            items: { type: number }
+        max_participation:
+          type: object
+          additionalProperties: { type: number }
+    OptimizationRequest:
+      type: object
+      required: [order, market, risk_aversion]
+      properties:
+        order:
+          $ref: '#/components/schemas/BasketOrder'
+        market:
+          $ref: '#/components/schemas/MarketSnapshot'
+        risk_aversion: { type: number, minimum: 0 }
+    OptimizationResult:
+      type: object
+      required: [schedule, expected_cost, risk_proxy]
+      properties:
+        schedule:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: number }
+        expected_cost: { type: number }
+        risk_proxy: { type: number }
